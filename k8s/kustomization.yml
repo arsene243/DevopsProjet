@@ -1,0 +1,9 @@
+# Fichier : k8s/kustomization.yml
+# Fichier de kustomization pour le déploiement de l'application
+
+resources:
+  - secrets.yml
+  - db-deployment.yml
+  - pgadmin-deployment.yml
+  - backend-deployment.yml
+  - frontend-deployment.yml

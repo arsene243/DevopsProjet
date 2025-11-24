@@ -1,0 +1,40 @@
+# Fichier : k8s/frontend-deployment.yml
+# Déploiement du frontend React
+
+# Déclaration du déploiement du frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-service
+  template:
+    metadata:
+      labels:
+        app: frontend-service
+    spec:
+      containers:
+        - name: frontend-service
+          image: frontend-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+
+---
+
+# Déclaration du service pour le frontend
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
