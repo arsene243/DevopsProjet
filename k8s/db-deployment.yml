@@ -1,0 +1,62 @@
+# Fichier : k8s/db-deployment.yml
+# Déploiement de la base de données PostgreSQL
+
+# Déclaration du PersistentVolumeClaim pour le stockage des données
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+# Déclaration du déploiement de PostgreSQL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-service
+  template:
+    metadata:
+      labels:
+        app: db-service
+    spec:
+      containers:
+        - name: db-service
+          image: postgres:15
+          envFrom:
+            - secretRef:
+                name: db-secret
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: db-pvc
+
+---
+
+# Déclaration du service pour la base de données
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  selector:
+    app: db-service
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

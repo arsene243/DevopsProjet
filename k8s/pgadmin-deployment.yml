@@ -1,0 +1,42 @@
+# Fichier : k8s/pgadmin-deployment.yml
+# Déploiement de PGAdmin
+
+# Déclaration du déploiement de PGAdmin
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin-service
+  template:
+    metadata:
+      labels:
+        app: pgadmin-service
+    spec:
+      containers:
+        - name: pgadmin-service
+          image: dpage/pgadmin4
+          envFrom:
+            - secretRef:
+                name: pgadmin-secret
+          ports:
+            - containerPort: 80
+
+---
+
+# Déclaration du service pour PGAdmin
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin-service
+spec:
+  selector:
+    app: pgadmin-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
